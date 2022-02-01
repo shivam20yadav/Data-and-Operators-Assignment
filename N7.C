@@ -1,75 +1,103 @@
 #include<stdio.h>
 #include<conio.h>
+int top=-1;
+int topc = -1;
+int a[100];
+char sign[100];
+void push(int val)
+{
+	top=top+1;
+	a[top]=val;
+}
+int pop()
+{
+	int val = a[top];
+	top=top-1;
+	return val;
+}
+void pushc(char val)
+{
+	topc=topc+1;
+	sign[topc]=val;
+}
+char popc()
+{
+	char temp = sign[topc];
+	topc=topc-1;
+	return temp;
+}
+int check()
+{
+	return(topc == -1) ;
+}
+int prece(char op)
+{
+	if(op == '+' || op == '-')
+		return 1;
+	if(op == '*' || op == '/')
+		return 2;
+	return 0;
+}
+int opr(int a,int b,char op)
+{
+	switch(op)
+	{
+		case '+':
+			return a+b;
+		case '-':
+			return a-b;
+		case '*':
+			return a*b;
+		case '/':
+			return a/b;
+	}
+}
 void main()
 {
 	char *art;
-	char *A,*B;
-	char sign = '\0';
-	int i,j,k;
-	int a,b,sum;
-	int temp = 0;
+	char temp;
+	int i,j,k=0;
+	int val1,val2;
+	int ans;
 	clrscr();
 	printf("opration:- ");
 	gets(art);
-	for(i=0;art[i] != '\0';i++)
+	for(i=0;i<=strlen(art);i++)
 	{
-		if(art[i] == '+'|| '-' || '*' || '/')
-		{
-			for(j=0;j<i;j++)
-			{
+		if(art[i] == ' ')
+			continue;
 
-				A[j] = art[j];
-			}
-			a = atoi(A);
-			for(k=i+1;art[k] != '\0';k++,temp++)
+		if(isdigit(art[i]))
+		{
+			k = 0;
+			while(isdigit(art[i]))
 			{
-				B[temp] = art[k];
+				k = (k * 10) + (art[i] - '0');
+				i++;
 			}
-			b = atoi(B);
+			push(k);
 		}
-	}
-	for(i=0;art[i] != '\0';i++)
-	{
-		if(art[i] == '+')
+		if(art[i] == '+'||art[i] == '-'||art[i] == '*'||art[i] == '/')
 		{
-			sign = art[i];
-			break;
+			while(!check() && prece(sign[top]) >= prece(art[i]))
+			{
+				val2 = pop();
+				val1 = pop();
+				temp = popc();
+				push(opr(val1,val2,temp));
+			}
+			pushc(art[i]);
 		}
-		if(art[i] == '-')
-		{
-			sign = art[i];
-			break;
-		}
-		if(art[i] == '*')
-		{
-			sign = art[i];
-			break;
-		}
-		if(art[i] == '/')
-		{
-			sign = art[i];
-			break;
-		}
+
+
 	}
-	if(sign == '+')
+	while(!check())
 	{
-		sum = a+b;
-		printf("%d + %d = %d",a,b,sum);
+		val2 = pop();
+		val1 = pop();
+		temp = popc();
+		push(opr(val1,val2,temp));
 	}
-	if(sign == '-')
-	{
-		sum = a-b;
-		printf("%d - %d = %d",a,b,sum);
-	}
-	if(sign == '*')
-	{
-		sum = a*b;
-		printf("%d * %d = %d",a,b,sum);
-	}
-	if(sign == '/')
-	{
-		sum = a/b;
-		printf("%d / %d = %d",a,b,sum);
-	}
+	printf("%d",a[top]);
 	getch();
 }
